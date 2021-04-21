@@ -1,0 +1,9 @@
+@media (min-width: 768px) {
+  .root-card {
+    display: flex;
+    justify-content: center;
+  }
+  .card {
+    margin: 20px;
+  }
+}
