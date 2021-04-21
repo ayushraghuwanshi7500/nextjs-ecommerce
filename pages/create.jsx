@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-
+import baseUrl from '../helpers/baseUrl';
 const create = () => {
   const [img, setImage] = useState('');
   const imagehandler = (e) => {
@@ -25,9 +25,22 @@ const create = () => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch(`${baseUrl}/api/products`, {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
 
+    const res2 = await res.json();
+    console.log(res2);
+    if (res2.error) {
+      M.toast({ html: res2.error, classes: 'red' });
+    }
+  };
   return (
-    <form className='container'>
+    <form className='container' onSubmit={(e) => handleSubmit(e)}>
       <input
         name='name'
         value={formData.name}
@@ -80,8 +93,7 @@ const create = () => {
       <br />
       <button
         className='btn waves-effect waves-light  #1565c0 blue darken-3'
-        type='button'
-        onClick={() => console.log(formData)}
+        type='submit'
       >
         Create
         <i className='material-icons right'>create</i>
