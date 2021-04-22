@@ -1,6 +1,8 @@
 import initDB from '../../helpers/initDB';
 import User from '../../models/User';
 import bcrypt from 'bcryptjs';
+import Cart from '../../models/Cart';
+import jwt from 'jsonwebtoken';
 initDB();
 
 export default async (req, res) => {
@@ -21,9 +23,22 @@ export default async (req, res) => {
         email: email,
         password: hashedPassword
       }).save();
-      return res
-        .status(200)
-        .json({ user: newUser, message: 'signup successful as ' + name + '!' });
+      await new Cart({
+        product: [],
+        user: newUser._id
+      }).save();
+      const token = jwt.sign(
+        { userId: newUser._id },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: '7d'
+        }
+      );
+      return res.status(200).json({
+        token: token,
+        user: newUser,
+        message: 'signup successful as ' + name + '!'
+      });
     }
   } catch (error) {
     console.log(error);

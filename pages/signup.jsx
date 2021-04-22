@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import baseUrl from '../helpers/baseUrl';
+import cookie from 'js-cookie';
+import { useRouter } from 'next/router';
 const signup = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,6 +28,10 @@ const signup = () => {
     if (res2.error) {
       M.toast({ html: res2.error, classes: 'red' });
     } else {
+      console.log(res2.token);
+      cookie.set('token', res2.token);
+      cookie.set('user', res2.user);
+      router.push('/account');
       M.toast({ html: res2.message, classes: 'green' });
     }
   };
