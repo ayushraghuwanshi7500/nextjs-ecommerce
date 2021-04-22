@@ -1,10 +1,14 @@
 import baseUrl from '../../helpers/baseUrl';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { parseCookies } from 'nookies';
+import cookie2 from 'js-cookie';
 const product = ({ product }) => {
   const cookie = parseCookies();
+  const [quantity, setQuantity] = useState(1);
   // console.log(cookie);
+  const token = cookie.token;
   const user = cookie.user ? JSON.parse(cookie.user) : '';
   const router = useRouter();
   const modalRef = useRef(null);
@@ -41,6 +45,26 @@ const product = ({ product }) => {
     await res.json();
     router.push('/');
   };
+  const addToCart = async () => {
+    const res = await fetch(`${baseUrl}/api/cart`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      },
+      body: JSON.stringify({ quantity: quantity, product: product._id })
+    });
+    const res2 = await res.json();
+    if (res2.error) {
+      M.toast({ html: error, classes: 'red' });
+      cookie2.remove('token');
+      cookie2.remove('user');
+      router.push('/login');
+    }
+    if (res2.message) {
+      M.toast({ html: res2.message, classes: 'green' });
+    }
+  };
   return (
     <div className='container center-align'>
       <h3>{product.name}</h3>
@@ -52,11 +76,26 @@ const product = ({ product }) => {
         style={{ width: '30%' }}
         min='1'
         placeholder='Quantity'
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
       />
-      <button className='btn waves-effect waves-light  #1565c0 blue darken-3'>
-        Add
-        <i className='material-icons right'>add</i>
-      </button>
+      {user && (
+        <button
+          onClick={addToCart}
+          className='btn waves-effect waves-light  #1565c0 blue darken-3'
+        >
+          Add
+          <i className='material-icons right'>add</i>
+        </button>
+      )}
+      {!user && (
+        <Link href='/login'>
+          <button className='btn waves-effect waves-light  #1565c0 blue darken-3'>
+            Login in to add to cart
+            <i className='material-icons right'>forward</i>
+          </button>
+        </Link>
+      )}
       {user.role === 'admin' && user.role === 'root' && (
         <button
           data-target='modal1'
