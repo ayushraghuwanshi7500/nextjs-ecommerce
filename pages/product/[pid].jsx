@@ -1,7 +1,11 @@
 import baseUrl from '../../helpers/baseUrl';
 import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
 const product = ({ product }) => {
+  const cookie = parseCookies();
+  // console.log(cookie);
+  const user = cookie.user ? JSON.parse(cookie.user) : '';
   const router = useRouter();
   const modalRef = useRef(null);
   useEffect(() => {
@@ -53,13 +57,15 @@ const product = ({ product }) => {
         Add
         <i className='material-icons right'>add</i>
       </button>
-      <button
-        data-target='modal1'
-        className='btn modal-trigger waves-effect waves-light #c62828 red darken-3'
-      >
-        Delete
-        <i className='material-icons right'>delete</i>
-      </button>
+      {user.role !== 'user' && (
+        <button
+          data-target='modal1'
+          className='btn modal-trigger waves-effect waves-light #c62828 red darken-3'
+        >
+          Delete
+          <i className='material-icons right'>delete</i>
+        </button>
+      )}
       {getModal()}
     </div>
   );

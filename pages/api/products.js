@@ -2,6 +2,7 @@ import initDB from '../../helpers/initDB';
 import Product from '../../models/Product';
 
 initDB();
+
 export default async (req, res) => {
   switch (req.method) {
     case 'GET':
@@ -10,7 +11,7 @@ export default async (req, res) => {
       break;
     case 'POST':
       const { name, price, description, mediaUrl } = req.body;
-      console.log(name, price, description);
+      console.log(name, price, description, mediaUrl);
       if (!name || !price || !description || !mediaUrl) {
         return res.status(422).json({ error: 'please add all the fields' });
       }
@@ -20,7 +21,7 @@ export default async (req, res) => {
         description: description,
         mediaUrl: mediaUrl
       }).save();
-      res.status(201).res.json(product);
+      res.status(201).json(product);
       break;
   }
 };

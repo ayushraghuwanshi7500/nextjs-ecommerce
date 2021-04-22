@@ -1,6 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import baseUrl from '../helpers/baseUrl';
+import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
 const create = () => {
+  const router = useRouter();
   const [img, setImage] = useState('');
   const imagehandler = (e) => {
     const reader = new FileReader();
@@ -17,19 +20,26 @@ const create = () => {
     price: '',
     mediaUrl: ''
   });
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
   const onChange = (e) => {
     if (e.target.name === 'mediaUrl') {
       imagehandler(e);
-      setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+      imageUpload(e);
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const res = await fetch(`${baseUrl}/api/products`, {
       method: 'POST',
-      headers: { 'Content-type': 'application/json' },
+      headers: {
+        'Content-type': 'application/json'
+      },
       body: JSON.stringify(formData)
     });
 
@@ -37,7 +47,29 @@ const create = () => {
     console.log(res2);
     if (res2.error) {
       M.toast({ html: res2.error, classes: 'red' });
+    } else {
+      M.toast({ html: 'Product upload Successful!', classes: 'green' });
+      router.replace('/');
     }
+  };
+  const imageUpload = async (e) => {
+    const data = new FormData();
+    const mediaUrl = e.target.files[0];
+    data.append('file', mediaUrl);
+    data.append('upload_preset', 'mystore');
+    data.append('cloud_name', 'ayushraghuwanshi');
+    const res = await fetch(
+      'https://api.cloudinary.com/v1_1/ayushraghuwanshi/image/upload',
+      {
+        method: 'POST',
+
+        body: data
+      }
+    );
+    const res2 = await res.json();
+    console.log(res2);
+    setFormData({ ...formData, mediaUrl: await res2.url });
+    return res2.url;
   };
   return (
     <form className='container' onSubmit={(e) => handleSubmit(e)}>
@@ -64,8 +96,8 @@ const create = () => {
         min='1'
         onChange={onChange}
       />
-      <div class='file-field input-field'>
-        <div class='btn'>
+      <div className='file-field input-field'>
+        <div className='btn'>
           <span>File</span>
           <input
             name='mediaUrl'
@@ -74,9 +106,9 @@ const create = () => {
             onChange={onChange}
           />
         </div>
-        <div class='file-path-wrapper'>
+        <div className='file-path-wrapper'>
           <input
-            class='file-path validate'
+            className='file-path validate'
             type='text'
             placeholder='Upload a file'
           />
@@ -101,5 +133,19 @@ const create = () => {
     </form>
   );
 };
+
+export async function getServerSideProps(context) {
+  const cookie = parseCookies(context);
+  const user = cookie.user ? JSON.parse(cookie.user) : '';
+  if (user.role != 'admin' || user.role != 'root') {
+    const { res } = context;
+    res.writeHead(302, { Location: '/' });
+    res.end();
+  }
+
+  return {
+    props: {}
+  };
+}
 
 export default create;

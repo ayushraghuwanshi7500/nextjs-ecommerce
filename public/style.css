@@ -3,7 +3,13 @@
     display: flex;
     justify-content: center;
   }
-  .card {
+  .pcard {
     margin: 20px;
   }
+}
+
+.authcard {
+  margin: 10px auto !important;
+  max-width: 500px !important;
+  padding: 10px;
 }
