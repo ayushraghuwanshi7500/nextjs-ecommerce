@@ -1,7 +1,18 @@
 import React from 'react';
 import { parseCookies } from 'nookies';
-const account = () => {
-  return <div>Accout page</div>;
+import baseUrl from '../helpers/baseUrl';
+const account = ({ allOrders }) => {
+  const cookie = parseCookies();
+  console.log(allOrders);
+  const user = cookie.user ? JSON.parse(cookie.user) : '';
+  return (
+    <div className='container'>
+      <div className='center-align'>
+        <h4>{user.name}</h4>
+        <h4>{user.email}</h4>
+      </div>
+    </div>
+  );
 };
 
 export async function getServerSideProps(context) {
@@ -11,9 +22,21 @@ export async function getServerSideProps(context) {
     res.writeHead(302, { Location: '/login' });
     res.end();
   }
-
+  const res = await fetch(`${baseUrl}/api/order`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  });
+  const orders = await res.json();
+  console.log('orders from gssp');
+  console.log(orders.orders);
+  const allOrders = orders.orders;
   return {
-    props: {}
+    props: {
+      allOrders: allOrders
+    }
   };
 }
 
