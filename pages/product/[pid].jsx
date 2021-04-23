@@ -63,6 +63,7 @@ const product = ({ product }) => {
     }
     if (res2.message) {
       M.toast({ html: res2.message, classes: 'green' });
+      router.replace('/cart');
     }
   };
   return (

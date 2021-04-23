@@ -12,6 +12,9 @@ export default async (req, res) => {
     case 'PUT':
       await addToCart(req, res);
       break;
+    case 'DELETE':
+      await removeProduct(req, res);
+      break;
   }
 };
 
@@ -35,7 +38,9 @@ function Authenticated(icomponent) {
 }
 
 const fetchUserCart = Authenticated(async (req, res) => {
-  const cart = await Cart.findOne({ user: req.userId });
+  const cart = await Cart.findOne({ user: req.userId }).populate(
+    'product.product'
+  );
   res.status(200).json(cart.product);
 });
 
@@ -60,4 +65,16 @@ const addToCart = Authenticated(async (req, res) => {
   }
   res.status(200).json({ message: 'product added to cart' });
   console.log(product, quantity, cart);
+});
+
+const removeProduct = Authenticated(async (req, res) => {
+  const { productId } = req.body;
+  console.log(productId);
+  const cart = await Cart.findOneAndUpdate(
+    { user: req.userId },
+    { $pull: { product: { product: productId } } },
+    { new: true }
+  ).populate('product.product');
+  console.log(cart);
+  res.status(200).json(cart.product);
 });
