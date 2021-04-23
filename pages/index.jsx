@@ -3,7 +3,7 @@ import Link from 'next/link';
 import baseUrl from '../helpers/baseUrl';
 export default function Home({ products }) {
   const productList = products.map((product) => (
-    <div className='card pcard' key={product._id}>
+    <div className='col s12 card pcard' key={product._id}>
       <div className='card-image'>
         <img
           src={product.mediaUrl}
@@ -25,7 +25,7 @@ export default function Home({ products }) {
   ));
 
   console.log(products);
-  return <div className='root-card'>{productList}</div>;
+  return <div className='row root-card'>{productList}</div>;
 }
 
 export async function getStaticProps(context) {

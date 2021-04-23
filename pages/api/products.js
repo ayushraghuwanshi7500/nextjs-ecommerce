@@ -21,7 +21,6 @@ export default async (req, res) => {
         description: description,
         mediaUrl: mediaUrl
       }).save();
-      res.status(201).json(product);
-      break;
+      return res.status(201).json(product);
   }
 };

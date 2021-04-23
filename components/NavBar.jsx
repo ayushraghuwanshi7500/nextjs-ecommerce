@@ -33,7 +33,7 @@ const NavBar = () => {
               <a>Cart</a>
             </Link>
           </li>
-          {userToken && user.role === 'admin' && user.role === 'root' && (
+          {(user.role === 'admin' || user.role === 'root') && (
             <li className={isActive('/create')}>
               <Link href='/create'>
                 <a>Create</a>

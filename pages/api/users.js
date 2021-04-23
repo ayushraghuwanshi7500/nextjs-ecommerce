@@ -9,7 +9,10 @@ initDB();
 export default async (req, res) => {
   switch (req.method) {
     case 'GET':
-      await fetchOrders(req, res);
+      await fetchUsers(req, res);
+      break;
+    case 'PUT':
+      await toggleRoleChange(req, res);
       break;
   }
 };
@@ -31,9 +34,22 @@ function Authenticated(icomponent) {
   };
 }
 
-const fetchOrders = Authenticated(async (req, res) => {
-  console.log(req.userId);
-  const orders = await Order.find({ user: req.userId }).populate('product.product');
-  console.log(orders);
-  res.status(200).json(orders);
+const fetchUsers = Authenticated(async (req, res) => {
+  const users = await User.find({ _id: { $ne: req.userId } });
+  console.log(users);
+  res.status(200).json(users);
+});
+
+const toggleRoleChange = Authenticated(async (req, res) => {
+  const { uid, role } = req.body;
+  console.log(uid, role);
+  const newRole = role === 'user' ? 'admin' : 'user';
+  const user = await User.findOneAndUpdate(
+    { _id: uid },
+    { role: newRole },
+    { new: true }
+  );
+  console.log(user);
+  const users = await User.find({ _id: { $ne: req.userId } });
+  return res.status(200).json(users);
 });

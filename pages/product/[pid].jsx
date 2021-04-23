@@ -97,7 +97,7 @@ const product = ({ product }) => {
           </button>
         </Link>
       )}
-      {user.role === 'admin' && user.role === 'root' && (
+      {(user.role === 'admin' || user.role === 'root') && (
         <button
           data-target='modal1'
           className='btn modal-trigger waves-effect waves-light #c62828 red darken-3'
